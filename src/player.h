@@ -10,14 +10,14 @@ class Player {
 	private:
 		std::string firstName;
 		std::string lastName;
-		std::map<std::string, int> statsMap;
+		int stat;
 		
 	public:
 		Player();
 
-		Player(std::string first, std::string last, int stats[10]);
+		Player(std::string first, std::string last, int stat);
 
-		int getStat(std::string statName);
+		inline int getStat() {return stat;};
 
 		inline std::string getName() {return (firstName+=" ")+=lastName;};
 };

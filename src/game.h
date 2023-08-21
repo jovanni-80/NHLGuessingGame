@@ -16,6 +16,10 @@ class Game {
 		int correctAnswer;
 		int guess;
 		Player players[2];
+		int getRandTeamID();
+		int getRandPlayerID(int teamID);
+		std::string generateRandStat();
+		std::string generateAPIRequest(int teamID, int playerID, std::string statName);
 
 	public:
 		Game();

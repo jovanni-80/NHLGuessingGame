@@ -3,23 +3,11 @@
 Player::Player() {
 	firstName = "";
 	lastName = "";
+	stat = 0;
 }
 
-Player::Player(std::string first, std::string last, int stats[sizeof(statArr)/sizeof(statArr[0])]) {
+Player::Player(std::string first, std::string last, int s) {
 	firstName = first;
 	lastName = last;
-
-	for(int i = 0; i < sizeof(statArr)/sizeof(statArr[0]); i++) {
-		statsMap[statArr[i]] = stats[i];
-	}
-}
-
-int Player::getStat(std::string statName) {
-	int ret = -1;
-
-	if (firstName != "") {
-		return statsMap[statName];
-	}
-
-	return -1;
+	stat = s;
 }

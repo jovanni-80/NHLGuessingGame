@@ -31,24 +31,24 @@
 *.out
 *.app
 
-./build/CMakeLists.txt.user
+CMakeLists.txt.user
 
-./build/CMakeCache.txt
+CMakeCache.txt
 
-./build/CMakeFiles
+CMakeFiles
 
-./build/CMakeScripts
+CMakeScripts
 
-./build/Testing
+Testing
 
-./build/Makefile
+Makefile
 
-./build/cmake_install.cmake
+cmake_install.cmake
 
-./build/install_manifest.txt
+install_manifest.txt
 
-./build/compile_commands.json
+compile_commands.json
 
-./build/CTestTestfile.cmake
+CTestTestfile.cmake
 
-./build/_deps
+_deps

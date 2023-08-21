@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cstdlib>
+#include "player.h"
 
 #ifndef GAME_H
 #define GAME_H
@@ -13,13 +13,14 @@ class Game {
 		int yearLowerBound;
 		int yearUpperBound;
 		int winStreak;
-		int guess;
 		int correctAnswer;
+		int guess;
+		Player players[2];
 
 	public:
 		Game();
 
-		int playRound();
+		bool playRound();
 
 		int endGame();
 

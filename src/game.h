@@ -1,5 +1,11 @@
-#include <cstdlib>
 #include "player.h"
+#include <cpr/cpr.h>
+#include <cstdlib>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #ifndef GAME_H
 #define GAME_H
@@ -7,31 +13,32 @@
 #define PLAYER_1 0
 #define PLAYER_2 1
 
+#define TEAM_FILE_PATH "/home/jovanni/Projects/NHLGuessingGame/src/teamIDs.txt"
+
 class Game {
-	private:
-		std::string currStat;
-		int yearLowerBound;
-		int yearUpperBound;
-		int winStreak;
-		int correctAnswer;
-		int guess;
-		Player players[2];
-		int getRandTeamID();
-		int getRandPlayerID(int teamID);
-		std::string generateRandStat();
-		std::string generateAPIRequest(int teamID, int playerID, std::string statName);
+private:
+  // helper functions
+  int getRandTeamID();
+  int getRandPlayerID(int teamID);
+  std::string generateRandStat();
+  std::string generateAPIRequest(int teamID, int playerID,
+                                 std::string statName);
 
-	public:
-		Game();
+  // member vars
+  std::string currStat;
+  int yearLowerBound, yearUpperBound, winStreak, correctAnswer, guess;
+  Player players[2];
 
-		bool playRound();
+public:
+  Game();
 
-		int endGame();
+  bool playRound();
 
-		inline int getWinStreak() {return winStreak;};
-		
-		inline int getCorrectAnswer() {return correctAnswer;};
-		
+  int endGame();
+
+  inline int getWinStreak() { return winStreak; };
+
+  inline int getCorrectAnswer() { return correctAnswer; };
 };
 
 #endif // GAME_H

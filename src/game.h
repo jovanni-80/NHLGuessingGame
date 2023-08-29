@@ -21,8 +21,7 @@ private:
   int getRandTeamID();
   int getRandPlayerID(int teamID);
   std::string generateRandStat();
-  std::string generateAPIRequest(int teamID, int playerID,
-                                 std::string statName);
+  std::string generatePlayerUrl(int teamID, int playerID, std::string statName);
 
   // member vars
   std::string currStat;

@@ -36,6 +36,7 @@ int Game::getRandTeamID() {
   return teamID;
 }
 
+// get random player ID from the API roster
 int Game::getRandPlayerID(int teamID) {
   // return player ID
 
@@ -85,15 +86,18 @@ std::string Game::generateRandStat() {
   return statArr[randStatIdx];
 }
 
-// generate the actual API request used to get the player name and stats
-std::string Game::generateAPIRequest(int teamID, int playerID,
-                                     std::string statName) {
+// generate the actual url to perform the request on
+std::string Game::generatePlayerUrl(int teamID, int playerID,
+                                    std::string statName) {
   int randSeason =
       (std::rand() % (yearUpperBound - yearLowerBound + 1)) + yearLowerBound;
   std::string randSeasons =
       std::to_string(randSeason).append(std::to_string(randSeason + 1));
 
-  return "";
+  std::string playerStatsUrl =
+      "https://statsapi.web.nhl.com/api/v1/people/" + std::to_string(playerID);
+
+  return playerStatsUrl;
 }
 
 // PUBLIC FUNCTIONS START HERE

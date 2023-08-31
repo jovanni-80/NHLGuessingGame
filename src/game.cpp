@@ -1,4 +1,5 @@
 #include "game.h"
+#include <cstdlib>
 
 using json = nlohmann::json;
 
@@ -28,8 +29,25 @@ int Game::getRandTeamID() {
     std::size_t commaSep = line.find(',');
     std::string teamName = line.substr(0, commaSep);
     teamID = std::stoi(line.substr(commaSep + 1));
+
+    cpr::Response r = cpr::Get(cpr::Url{
+        "https://statsapi.web.nhl.com/api/v1/teams/" + std::to_string(teamID)});
+
+    if (r.status_code == 200) {
+      json jsonResponse = json::parse(r.text);
+
+      if (jsonResponse["teams"][0].contains("firstYearOfPlay")) {
+        yearLowerBound = std::max(
+            std::stoi(std::string(jsonResponse["teams"][0]["firstYearOfPlay"])),
+            yearLowerBound);
+      }
+
+    } else {
+      std::cerr << "Error [" << r.status_code
+                << "] making request in getRandTeamID()" << std::endl;
+    }
   } else {
-    std::cout << "OpenFileError" << std::endl;
+    std::cerr << "OpenFileError" << std::endl;
   }
 
   /// return team id
@@ -39,6 +57,13 @@ int Game::getRandTeamID() {
 // get random player ID from the API roster
 int Game::getRandPlayerID(int teamID) {
   // return player ID
+  int playerID = -1;
+
+  int randSeason =
+      (std::rand() % (yearUpperBound - yearLowerBound)) + yearLowerBound;
+
+  std::string randSeasonStr =
+      std::to_string(randSeason).append(std::to_string(randSeason + 1));
 
   // request team roster from random team
   std::string rosterRequestUrl = "https://statsapi.web.nhl.com/api/v1/teams/" +
@@ -47,28 +72,33 @@ int Game::getRandPlayerID(int teamID) {
   cpr::Response r =
       cpr::Get(cpr::Url{rosterRequestUrl},
                cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC},
-               cpr::Parameters{{"anon", "true"}, {"key", "value"}});
+               cpr::Parameters{{"season", randSeasonStr}});
 
   // status code was successful
   if (r.status_code == 200) {
     json jsonResponse = json::parse(r.text);
     // Extract "fullName" from the JSON
     if (jsonResponse.contains("roster") && jsonResponse["roster"].is_array()) {
-      for (const json &player : jsonResponse["roster"]) {
-        if (player.contains("person") &&
-            player["person"].contains("fullName")) {
-          std::string fullName = player["person"]["fullName"];
-          int id = player["person"]["id"];
-          std::cout << "Player Full Name: " << fullName << " : " << id
-                    << std::endl;
+      bool randPlayerFound = false;
+
+      while (!randPlayerFound) {
+        int randPlayerIdx = rand() % jsonResponse["roster"].size();
+        if (jsonResponse["roster"][randPlayerIdx]["position"]["code"] != "G") {
+          randPlayerFound = true;
+          playerID = jsonResponse["roster"][randPlayerIdx]["person"]["id"];
+          std::cout
+              << jsonResponse["roster"][randPlayerIdx]["person"]["fullName"]
+              << std::endl;
         }
       }
+
     } else {
       std::cerr << "Invalid JSON response format." << std::endl;
       return 1;
     }
   } else {
-    std::cerr << "Error [" << r.status_code << "] making request" << std::endl;
+    std::cerr << "Error [" << r.status_code
+              << "] making request in getRandPlayerID()" << std::endl;
   }
 
   // roster request format:
@@ -76,7 +106,7 @@ int Game::getRandPlayerID(int teamID) {
   // compared get whole roster randomly select member from whole roster until
   // you don't have a goalie
 
-  return 0;
+  return playerID;
 }
 
 // return a random stat from available stats to guess
@@ -89,10 +119,6 @@ std::string Game::generateRandStat() {
 // generate the actual url to perform the request on
 std::string Game::generatePlayerUrl(int teamID, int playerID,
                                     std::string statName) {
-  int randSeason =
-      (std::rand() % (yearUpperBound - yearLowerBound + 1)) + yearLowerBound;
-  std::string randSeasons =
-      std::to_string(randSeason).append(std::to_string(randSeason + 1));
 
   std::string playerStatsUrl =
       "https://statsapi.web.nhl.com/api/v1/people/" + std::to_string(playerID);
@@ -104,7 +130,7 @@ std::string Game::generatePlayerUrl(int teamID, int playerID,
 // Game initializer
 Game::Game() {
   std::srand((unsigned)time(0));
-  yearUpperBound = 2023;
+  yearUpperBound = 2022;
   yearLowerBound = 1980;
 }
 
@@ -113,22 +139,11 @@ bool Game::playRound() {
   // get random teams
   std::string randTeam[2];
 
-  // get team and stat first
-  getRandPlayerID(getRandTeamID());
-  currStat = generateRandStat();
+  // get random player from random team (from random year) with api
+  int firstPlayerID = getRandPlayerID(getRandTeamID());
+  int secondPlayerID = getRandPlayerID(getRandTeamID());
 
-  // get random seasons to choose roster random season should be in range of
-  // team and bounds
-  std::string randSeasons[2];
-  int randSeason1 =
-      (std::rand() % (yearUpperBound - yearLowerBound + 1)) + yearLowerBound;
-  int randSeason2 =
-      (std::rand() % (yearUpperBound - yearLowerBound + 1)) + yearLowerBound;
-
-  randSeasons[PLAYER_1] =
-      std::to_string(randSeason1).append(std::to_string(randSeason1 + 1));
-  randSeasons[PLAYER_2] =
-      std::to_string(randSeason1).append(std::to_string(randSeason2 + 1));
+  this->currStat = generateRandStat();
 
   // using random season, get roster of team from that season
   // create player
@@ -137,8 +152,8 @@ bool Game::playRound() {
   int p1stat = std::rand() % 100 + 1;
   int p2stat = std::rand() % 100 + 1;
 
-  Player p1("Jovanni", "Rodriguez", p1stat);
-  Player p2("Justin", "Lantz", p2stat);
+  Player p1("Player", "1", p1stat);
+  Player p2("Player", "2", p2stat);
 
   // prompt user to enter guess
   std::cout << "Who has more " << currStat << "?\n";

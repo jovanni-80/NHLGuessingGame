@@ -59,11 +59,26 @@ int Game::getRandPlayerID(int teamID) {
   // return player ID
   int playerID = -1;
 
+  // create a vector with years from yearlower to year upper bound;
+  std::vector<int> validTeamYears;
+  for (int i = yearLowerBound; i < yearUpperBound; i++) {
+    validTeamYears.push_back(i);
+  }
+
+  // fisher yates swap to ensure no invalid years are tried more than once when making the requests
+  int vSize = validTeamYears.size();
+  for (int i = 0; i < vSize; i++) {
+    int j = i + rand() % (vSize - i);
+    // swap entries
+    int temp = validTeamYears[j];
+    validTeamYears[j] = validTeamYears[i];
+    validTeamYears[i] = validTeamYears[j];
+  }
+
+  int validYearIdx = 0;
   cpr::Response r;
-  // the years that the API provide do not necessarily coincide with active team, no other way to get team ID
-  while (r.status_code != 200) {
-    int randSeason =
-        (std::rand() % (yearUpperBound - yearLowerBound)) + yearLowerBound;
+  while (r.status_code != 200 && validYearIdx < vSize) {
+    int randSeason = validTeamYears[validYearIdx];
 
     std::string randSeasonStr =
         std::to_string(randSeason).append(std::to_string(randSeason + 1));
@@ -76,6 +91,8 @@ int Game::getRandPlayerID(int teamID) {
     r =
         cpr::Get(cpr::Url{rosterRequestUrl},
                 cpr::Parameters{{"season", randSeasonStr}});
+
+    validYearIdx ++;
   }
 
   // status code was successful

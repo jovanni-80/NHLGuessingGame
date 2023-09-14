@@ -87,7 +87,6 @@ int Game::getRandPlayerID(int teamID) {
     std::string rosterRequestUrl = "https://statsapi.web.nhl.com/api/v1/teams/" +
                                   std::to_string(teamID) + "/roster";
 
-    std::cout << rosterRequestUrl << "?season=" + randSeasonStr << std::endl;
     r =
         cpr::Get(cpr::Url{rosterRequestUrl},
                 cpr::Parameters{{"season", randSeasonStr}});

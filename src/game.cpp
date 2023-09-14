@@ -59,20 +59,24 @@ int Game::getRandPlayerID(int teamID) {
   // return player ID
   int playerID = -1;
 
-  int randSeason =
-      (std::rand() % (yearUpperBound - yearLowerBound)) + yearLowerBound;
+  cpr::Response r;
+  // the years that the API provide do not necessarily coincide with active team, no other way to get team ID
+  while (r.status_code != 200) {
+    int randSeason =
+        (std::rand() % (yearUpperBound - yearLowerBound)) + yearLowerBound;
 
-  std::string randSeasonStr =
-      std::to_string(randSeason).append(std::to_string(randSeason + 1));
+    std::string randSeasonStr =
+        std::to_string(randSeason).append(std::to_string(randSeason + 1));
 
-  // request team roster from random team
-  std::string rosterRequestUrl = "https://statsapi.web.nhl.com/api/v1/teams/" +
-                                 std::to_string(teamID) + "/roster";
+    // request team roster from random team
+    std::string rosterRequestUrl = "https://statsapi.web.nhl.com/api/v1/teams/" +
+                                  std::to_string(teamID) + "/roster";
 
-  cpr::Response r =
-      cpr::Get(cpr::Url{rosterRequestUrl},
-               cpr::Authentication{"user", "pass", cpr::AuthMode::BASIC},
-               cpr::Parameters{{"season", randSeasonStr}});
+    std::cout << rosterRequestUrl << "?season=" + randSeasonStr << std::endl;
+    r =
+        cpr::Get(cpr::Url{rosterRequestUrl},
+                cpr::Parameters{{"season", randSeasonStr}});
+  }
 
   // status code was successful
   if (r.status_code == 200) {
@@ -97,8 +101,7 @@ int Game::getRandPlayerID(int teamID) {
       return 1;
     }
   } else {
-    std::cerr << "Error [" << r.status_code
-              << "] making request in getRandPlayerID()" << std::endl;
+    std::cerr << "Error [" << r.status_code << "] making request in getRandPlayerID()" << std::endl;
   }
 
   // roster request format:

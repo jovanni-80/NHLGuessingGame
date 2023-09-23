@@ -158,21 +158,13 @@ bool Game::playRound() {
   // get random teams
   std::string randTeam[2];
 
-  // get random player from random team (from random year) with api
-  int firstPlayerID = getRandPlayerID(getRandTeamID());
-  int secondPlayerID = getRandPlayerID(getRandTeamID());
-
+  // just generate random stat for now
   this->currStat = generateRandStat();
-
-  // using random season, get roster of team from that season
-  // create player
-
-  // create a random player for now
   int p1stat = std::rand() % 100 + 1;
   int p2stat = std::rand() % 100 + 1;
 
-  Player p1("Player", "1", p1stat);
-  Player p2("Player", "2", p2stat);
+  Player p1("Player", "1", getRandPlayerID(getRandTeamID()), currStat);
+  Player p2("Player", "2", getRandPlayerID(getRandTeamID()), currStat);
 
   // prompt user to enter guess
   std::cout << "Who has more " << currStat << "?\n";

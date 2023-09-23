@@ -3,11 +3,13 @@
 Player::Player() {
   firstName = "";
   lastName = "";
-  stat = 0;
 }
 
-Player::Player(std::string first, std::string last, int s) {
+Player::Player(std::string first, std::string last, int id, std::string s) {
   firstName = first;
   lastName = last;
-  stat = s;
+  id = id;
+
+  // make api call for stat
+  stat = 0;
 }

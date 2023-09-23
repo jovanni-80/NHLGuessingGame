@@ -12,17 +12,14 @@ const std::string statArr[10] = {
 class Player {
 private:
   std::string firstName;
-
   std::string lastName;
-  int stat;
+  unsigned int id;
+  unsigned int stat;
 
 public:
   Player();
-
-  Player(std::string first, std::string last, int stat);
-
+  Player(std::string first, std::string last, int id, std::string stat);
   inline int getStat() { return stat; };
-
   inline std::string getName() { return (firstName += " ") += lastName; };
 };
 
